@@ -126,11 +126,13 @@ Setting up a Metropolis Hastings (MH) updating algorithm involves several steps.
 In this section, we provide the functions and R code necessary to implement these steps. In addition, we describe how to obtain summary statistics of the posterior distributions of parameters and plot density. We begin with the theory for this algorithm.
 
 We use a single-update random walk MH algorithm with normal proposal density, where we cycle through each parameter in the full likelihood ${\mathcal L}_{n,y|z}$ (see below for the full likelihood used for our case study). During each iteration of the MCMC algorithm, we update each of the parameters by proposing to move to a new state and accepting this move with some probability. To update, say, parameter $\beta_0$ (contained in the model with parameters $\beta_0$ and $\theta$) at iteration $t$ with current value $\beta^t_0$, we propose to move to a new state, $\beta'_0$, with $\beta'_0 \sim N\left(\beta^t_0,\sigma^2_{\beta_0}\right)$ [@Hastings1970; @Davison2003], where $\sigma^2_{\beta_0}$ is the proposal variance for $\beta_0$. This newly proposed state is accepted as the new state with probability $\alpha(\beta'_0|\beta_0^t)$ given by: 
+<!-- Github complains about the equation below, but it renders just fine into HTML by R-Studio, commented out here
 $$
 \alpha(\beta'_0|\beta_0^{t})=\min\left(1,\frac{{\mathcal L}_{n,y|z}(\beta'_0,\theta^t)p(\beta'_0)q(\beta_0^{t}|\beta'_0)}    {{\mathcal L}_{n,y|z}(\beta_0^{t},\theta^t)p(\beta_0^{t})q(\beta'_0|\beta_0^{t})} \right)~.
 \label{eq:mhupdate}
 \tag{1}
 $$
+-->
 where ${\mathcal L}_{n,y|z}(\beta'_0,\theta^t)$ is the full likelihood calculated using the newly proposed value $\beta'_0$ and current values $\theta^t$; $p(\beta'_0)$ is the prior distribution for $\beta_0$ evaluated at $\beta_0 = \beta'_0$ and $q(\beta'_0|\beta_0^{t})$ denotes the proposal density of the newly proposed state $\beta'_0$ given that the current state is $\beta_0^{t}$. We note that the terms $q(\beta_0^{t}|\beta'_0)$ and $q(\beta'_0|\beta_0^{t})$ cancel in the acceptance probability as we use a symmetrical proposal distribution (normal). Equation 1 is equivalent to equation 8.39 from Section 8.4.1 of the book. 
 
 In the following we describe each of the terms required to calculate the acceptance probability, i.e., the likelihood, the prior distributions and the proposal distributions. 
