@@ -126,13 +126,10 @@ Setting up a Metropolis Hastings (MH) updating algorithm involves several steps.
 In this section, we provide the functions and R code necessary to implement these steps. In addition, we describe how to obtain summary statistics of the posterior distributions of parameters and plot density. We begin with the theory for this algorithm.
 
 We use a single-update random walk MH algorithm with normal proposal density, where we cycle through each parameter in the full likelihood ${\mathcal L}_{n,y|z}$ (see below for the full likelihood used for our case study). During each iteration of the MCMC algorithm, we update each of the parameters by proposing to move to a new state and accepting this move with some probability. To update, say, parameter $\beta_0$ (contained in the model with parameters $\beta_0$ and $\theta$) at iteration $t$ with current value $\beta^t_0$, we propose to move to a new state, $\beta'_0$, with $\beta'_0 \sim N\left(\beta^t_0,\sigma^2_{\beta_0}\right)$ [@Hastings1970; @Davison2003], where $\sigma^2_{\beta_0}$ is the proposal variance for $\beta_0$. This newly proposed state is accepted as the new state with probability $\alpha(\beta'_0|\beta_0^t)$ given by: 
-<!-- Github complains about the equation below, but it renders just fine into HTML by R-Studio, commented out here
 $$
-\alpha(\beta'_0|\beta_0^{t})=\min\left(1,\frac{{\mathcal L}_{n,y|z}(\beta'_0,\theta^t)p(\beta'_0)q(\beta_0^{t}|\beta'_0)}    {{\mathcal L}_{n,y|z}(\beta_0^{t},\theta^t)p(\beta_0^{t})q(\beta'_0|\beta_0^{t})} \right)~.
-\label{eq:mhupdate}
+\alpha(\beta'_0|\beta_0^{t}) = \min \left(1,\frac{\mathcal{L}_{n,y|z}(\beta'_0,\theta^t)p(\beta'_0)q(\beta_0^{t}|\beta'_0)} {\mathcal{L}_{n,y|z}(\beta_0^{t},\theta^t)p(\beta_0^{t})q(\beta'_0|\beta_0^{t})} \right)~.
 \tag{1}
 $$
--->
 where ${\mathcal L}_{n,y|z}(\beta'_0,\theta^t)$ is the full likelihood calculated using the newly proposed value $\beta'_0$ and current values $\theta^t$; $p(\beta'_0)$ is the prior distribution for $\beta_0$ evaluated at $\beta_0 = \beta'_0$ and $q(\beta'_0|\beta_0^{t})$ denotes the proposal density of the newly proposed state $\beta'_0$ given that the current state is $\beta_0^{t}$. We note that the terms $q(\beta_0^{t}|\beta'_0)$ and $q(\beta'_0|\beta_0^{t})$ cancel in the acceptance probability as we use a symmetrical proposal distribution (normal). Equation 1 is equivalent to equation 8.39 from Section 8.4.1 of the book. 
 
 In the following we describe each of the terms required to calculate the acceptance probability, i.e., the likelihood, the prior distributions and the proposal distributions. 
@@ -140,7 +137,7 @@ In the following we describe each of the terms required to calculate the accepta
 ## Defining the likelihood function
 In Section 8.2.2 of the book we learned that when including covariates in the detection function, the full likelihood is ${\mathcal L}_{n,z,y} = {\mathcal L}_n\times{\mathcal L}_z\times{\mathcal L}_{y|z}$. However, in comparison to Section 8.2.2, we use a plot count model ${\mathcal L}_n$ introduced in  Section 8.2.4.1 of the book and extended with a random effect in Section 8.2.5.1. As it can be difficult to specify a good model for the covariates ${\bf z}$, we can simplify the modelling by omitting the component ${\mathcal L}_z$ from the likelihood and using the remainder, conditional on ${\bf z}$:
 $$
-{\mathcal L}_{n,y|z} = {\mathcal L}_n\times{\mathcal L}_{y|z}~.
+\mathcal{L}_{n,y|z} = \mathcal{L}_n \times \mathcal{L}_{y|z}~.
 \nonumber
 $$
 To avoid numerical problems, we use the log-likelihood which is given by: 
@@ -461,7 +458,7 @@ This algorithm involves defining a number of iterations $nt$ and updating each p
 
 Additionally, as we have a random effect in the count model, we need to update each of the random effect coefficients $b_l$ during each iteration. However, when updating the random effect coefficients, we can take a few shortcuts to make the algorithm more time-efficient. Firstly, we do not calculate prior probabilities for updating the coefficients (for our models, we do not place priors on the random effect coefficients). Also, as before we use symmetrical (normal) proposal distributions. Hence, when updating for example the random effect coefficient for site $l = 1$, the acceptance probability from equation 1 reduces to: 
 $$
-\alpha(b'_1|b_1^{t})=\min\left(1,\frac{{\mathcal L}_{n,y|z}(b'_1,p^t,b^t_{-1})} {{\mathcal L}_{n,y|z}(b_1^{t},p^t,b^t_{-1})} \right)~.
+\alpha(b'_1|b_1^{t})=\min\left(1,\frac{{\mathcal L}_{n,y|z}(b'_1,p^t,b^t_{-1})}{{\mathcal L}_{n,y|z}(b_1^{t},p^t,b^t_{-1})} \right)~.
 $$
 
 Furthermore, we no longer need to calculate the full likelihood for updating each random effect coefficient. We now may limit the calculations to those parts that make a difference when subtracting the log-likelihood with the current value of the random effect coefficient $log_e({\mathcal L}_{n,y|z}(b_1^{t},p^t,b^t_{-1}))$ from the log-likelihood with the updated value of the random effect coefficient $log_e({\mathcal L}_{n,y|z}(b'_1,p^t,b^t_{-1}))$. Here, we no longer need the likelihood contribution for the detection model (the component *log.e* from the overall log-likelihood `log.lik` in `covey.full.bayes.log.lik` above) as this component will remain unaffected when updating any of the $b_l$. For updating a single random effect coefficient, we need to include the Poisson likelihoods for each count at the respective site as well as the normal density for the coefficient. Hence, following the example for updating the random effect coefficient $b_1$ for site $l = 1$, the following part for the overall likelihood is included in calculating the acceptance probability: $\sum_{k=1}^K \sum_{t=1}^{T_k}\log_e\left(\frac{\lambda_{1kt}^{n_{1kt}} \exp[-\lambda_{1kt}]}{n_{1kt}!}\right) + \log_e \left(\frac{1}{\sqrt{2\pi \sigma_l^2}}\exp\left[-\frac{b_1^2}{2\sigma_l^2}\right]\right)$.
