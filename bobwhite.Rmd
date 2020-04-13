@@ -36,7 +36,9 @@ The covey data stem from a designed experiment where the interest was in determi
 As the interest was in determining whether covey densities were higher on treatment fields, we use plot count models where the observed counts are modelled as a function of covariates. Here, the parameter of interest is the coefficient for the *Type* covariate for the level "TREAT". A coefficient that is significantly greater than zero would indicate that the buffers had the desired effect, i.e., increased covey densities. Due to the repeated counts and the spatial closeness of points within a pair, we include a random effect for each site (where 'site' refers to a pair of points) in the count model (see below for details). For simplicity, we reduced the data presented in Section 8.5.2 of the book to four states leaving 183 sites. In addition, we did not include the covariate *Year* for the detection or count models. Hence, the resulting parameter estimates are not directly comparable to those presented in Section 8.5.2. 
 
 ## Importing the data and functions into an R Studio workspace
-For completing this case study, we need to download the zip file [CoveyCaseStudy.zip](CaseStudyBOWH.zip) and extract these into a designated folder on our personal computers. Source the functions necessary for the case study, by running the following R code. 
+For completing this case study, duplicate the directory structure of this [Github repository](https://github.com/distanceexamples/book-bobwhite). There is a subdirectory for **source code**, another for **data**, another for **images** and finally a subdirectory for **workspaces**.  These last two subdirectories are used by this Rmarkdown file to present results of analyses without the necessity of re-running the computationally intensive parts of the code.
+
+Source the functions necessary for the case study, by running the following R code. 
 
 ```{r eval=myeval}
 source("source code/bl.function.r")
