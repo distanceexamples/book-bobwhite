@@ -458,7 +458,7 @@ This algorithm involves defining a number of iterations $nt$ and updating each p
 
 Additionally, as we have a random effect in the count model, we need to update each of the random effect coefficients $b_l$ during each iteration. However, when updating the random effect coefficients, we can take a few shortcuts to make the algorithm more time-efficient. Firstly, we do not calculate prior probabilities for updating the coefficients (for our models, we do not place priors on the random effect coefficients). Also, as before we use symmetrical (normal) proposal distributions. Hence, when updating for example the random effect coefficient for site $l = 1$, the acceptance probability from equation 1 reduces to: 
 $$
-\alpha(b'_1|b_1^{t})=\min\left(1,\frac{{\mathcal L}_{n,y|z}(b'_1,p^t,b^t_{-1})}{{\mathcal L}_{n,y|z}(b_1^{t},p^t,b^t_{-1})} \right)~.
+\alpha(b'_1|b_1^{t})=\min\left(1,\frac{\mathcal{L}_{n,y|z}(b'_1,p^t,b^t_{-1})} {\mathcal{L}_{n,y|z}(b_1^{t},p^t,b^t_{-1})} \right)~.
 $$
 
 Furthermore, we no longer need to calculate the full likelihood for updating each random effect coefficient. We now may limit the calculations to those parts that make a difference when subtracting the log-likelihood with the current value of the random effect coefficient $log_e({\mathcal L}_{n,y|z}(b_1^{t},p^t,b^t_{-1}))$ from the log-likelihood with the updated value of the random effect coefficient $log_e({\mathcal L}_{n,y|z}(b'_1,p^t,b^t_{-1}))$. Here, we no longer need the likelihood contribution for the detection model (the component *log.e* from the overall log-likelihood `log.lik` in `covey.full.bayes.log.lik` above) as this component will remain unaffected when updating any of the $b_l$. For updating a single random effect coefficient, we need to include the Poisson likelihoods for each count at the respective site as well as the normal density for the coefficient. Hence, following the example for updating the random effect coefficient $b_1$ for site $l = 1$, the following part for the overall likelihood is included in calculating the acceptance probability: $\sum_{k=1}^K \sum_{t=1}^{T_k}\log_e\left(\frac{\lambda_{1kt}^{n_{1kt}} \exp[-\lambda_{1kt}]}{n_{1kt}!}\right) + \log_e \left(\frac{1}{\sqrt{2\pi \sigma_l^2}}\exp\left[-\frac{b_1^2}{2\sigma_l^2}\right]\right)$.
@@ -666,7 +666,7 @@ $$
 
 for this particular model move. We then calculate the acceptance probability $A(m'|m)$ for this proposed move using equation 5 (equivalent to equation 8.42 from Section 8.4.2 of the book). However, for our proposed move, this equation can be simplified. As we use the identity function as the bijective function, the Jacobian $|J|$ equals 1. Furthermore, as we consider all model probabilities equally likely, $P(m|m')$ and $P(m'|m)$ as well as $p(m)$ and $p(m')$ cancel in equation 5. This leaves calculating the likelihoods (for the newly proposed model ${\mathcal L}_{n,y|z}(p',m')$ as well as the current model ${\mathcal L}_{n,y|z}(p,m)$), the proposal densities for the new parameters ($q\left(u_2\right)q\left(u_3\right)q\left(u_4\right)$) and the prior probabilities for the new parameters ($p(\beta'_2)p(\beta'_3)p(\beta'_4)$):
 $$
-A(m'|m) = \frac{{\mathcal L}_{n,y|z}(p',m')p(\beta'_2)p(\beta'_3)p(\beta'_4)} {{\mathcal L}_{n,y|z}(p,m)q\left(u_2\right)q\left(u_3\right)q\left(u_4\right)}~.
+A(m'|m) = \frac{\mathcal{L}_{n,y|z}(p',m')p(\beta'_2)p(\beta'_3)p(\beta'_4)} {\mathcal{L}_{n,y|z}(p,m)q\left(u_2\right)q\left(u_3\right)q\left(u_4\right)}~.
 \tag{5}
 $$
 
